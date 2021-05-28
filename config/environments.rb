@@ -30,7 +30,7 @@ module Credence
     ONE_MONTH = 30 * 24 * 60 * 60
 
     configure do
-      SecureSession.setup(ENV['REDIS_URL']) # REDIS_URL used again below
+      SecureSession.setup(ENV['REDIS_TLS_URL']) # REDIS_TLS_URL used again below
       SecureMessage.setup(ENV.delete('MSG_KEY'))
     end
 
@@ -39,7 +39,10 @@ module Credence
 
       use Rack::Session::Redis,
           expire_after: ONE_MONTH,
-          redis_server: ENV.delete('REDIS_URL')
+          redis_server: {
+            url: ENV.delete('REDIS_TLS_URL'),
+            ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE }
+          }
     end
 
     configure :development, :test do
@@ -51,7 +54,10 @@ module Credence
 
       # use Rack::Session::Redis,
       #     expire_after: ONE_MONTH,
-      #     redis_server: ENV.delete('REDIS_URL')
+      #     redis_server: {
+      #       url: ENV.delete('REDIS_TLS_URL'),
+      #       ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE }
+      #     }
     end
 
     configure :development, :test do
